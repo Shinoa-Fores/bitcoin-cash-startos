@@ -123,13 +123,13 @@ export const getConfig: T.ExpectedExports.getConfig = async (effects) => {
     "zmq-enabled": {
       type: "boolean",
       name: "ZeroMQ Enabled",
-      description: "The ZeroMQ interface is useful for some applications which might require data related to block and transaction events from Bitcoin Core. For example, LND requires ZeroMQ be enabled for LND to get the latest block data",
+      description: "The ZeroMQ interface is useful for some applications which might require data related to block and transaction events from Bitcoin Cash. For example, LND requires ZeroMQ be enabled for LND to get the latest block data",
       default: true,
     },
     txindex: {
       type: "boolean",
       name: "Transaction Index",
-      description: "By enabling Transaction Index (txindex) Bitcoin Core will build a complete transaction index. This allows Bitcoin Core to access any transaction with commands like `gettransaction`.",
+      description: "By enabling Transaction Index (txindex) Bitcoin Cash will build a complete transaction index. This allows Bitcoin Cash to access any transaction with commands like `gettransaction`.",
       default: allowUnpruned,
     },
     coinstatsindex: {
