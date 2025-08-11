@@ -1,8 +1,12 @@
-# Build stage for BerkeleyDB
-FROM --platform=linux/arm64 lncm/berkeleydb AS berkeleydb
+# From https://github.com/ruimarinho/docker-bitcoin-cash
 
-# Build stage for Bitcoin Cash
-FROM --platform=linux/arm64 alpine:3.18 AS bitcoin-cash
+# Build stage for BerkeleyDB
+ARG PLATFORM
+
+FROM lncm/berkeleydb:db-4.8.30.NC-${PLATFORM} AS berkeleydb
+
+# Build stage for Bitcoin Core
+FROM alpine:3.21 AS bitcoin-cash
 
 COPY --from=berkeleydb /opt /opt
 
@@ -23,7 +27,7 @@ RUN apk --no-cache add \
         sqlite-dev \
         zeromq-dev
 
-ADD ./bitcoin-cash-node /bitcoin
+ADD ./bitcoin /bitcoin
 
 ENV BITCOIN_PREFIX=/opt/bitcoin
 
@@ -31,6 +35,7 @@ WORKDIR /bitcoin
 
 RUN ./autogen.sh
 RUN ./configure LDFLAGS=-L`ls -d /opt/db*`/lib/ CPPFLAGS=-I`ls -d /opt/db*`/include/ \
+  # If building on Mac make sure to increase Docker VM memory, or uncomment this line. See https://github.com/bitcoin/bitcoin/issues/6658 for more info.
   # CXXFLAGS="--param ggc-min-expand=1 --param ggc-min-heapsize=32768" \
   CXXFLAGS="-O1" \
   CXX=clang++ CC=clang \
@@ -47,11 +52,14 @@ RUN ./configure LDFLAGS=-L`ls -d /opt/db*`/lib/ CPPFLAGS=-I`ls -d /opt/db*`/incl
 RUN make -j$(nproc)
 RUN make install
 RUN strip ${BITCOIN_PREFIX}/bin/*
-RUN strip ${BITCOIN_PREFIX}/lib/libbitcoinconsensus.a
-RUN strip ${BITCOIN_PREFIX}/lib/libbitcoinconsensus.so.0.0.0
 
 # Build stage for compiled artifacts
-FROM --platform=linux/arm64 alpine:3.18
+FROM alpine:3.21
+
+LABEL maintainer.0="João Fonseca (@joaopaulofonseca)" \
+  maintainer.1="Pedro Branco (@pedrobranco)" \
+  maintainer.2="Rui Marinho (@ruimarinho)" \
+  maintainer.3="Aiden McClelland (@dr-bonez)"
 
 RUN sed -i 's/http\:\/\/dl-cdn.alpinelinux.org/https\:\/\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
 RUN apk --no-cache add \
@@ -61,7 +69,7 @@ RUN apk --no-cache add \
   libzmq \
   sqlite-dev \
   tini \
-  yq \
+  yq
 RUN rm -rf /var/cache/apk/*
 
 ARG ARCH
