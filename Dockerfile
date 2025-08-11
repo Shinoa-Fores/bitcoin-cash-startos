@@ -27,7 +27,7 @@ RUN apk --no-cache add \
         sqlite-dev \
         zeromq-dev
 
-ADD ./bitcoin /bitcoin
+ADD ./bitcoin-cash-node /bitcoin
 
 ENV BITCOIN_PREFIX=/opt/bitcoin
 
