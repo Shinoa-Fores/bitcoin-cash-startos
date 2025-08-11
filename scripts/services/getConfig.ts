@@ -1,4 +1,4 @@
-import { ConfigSpec } from "https://deno.land/x/embassyd_sdk@v0.3.4.3.0-alpha1/types.ts";
+import { ConfigSpec } from "https://deno.land/x/embassyd_sdk@v0.3.4.3.2/types.ts";
 import { compat, types as T } from "../dependencies.ts";
 
 export const getConfig: T.ExpectedExports.getConfig = async (effects) => {
