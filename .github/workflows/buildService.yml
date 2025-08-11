@@ -24,6 +24,7 @@ jobs:
         run: |
           git submodule update --init --recursive
           start-sdk init
+          deno install -A -r "https://deno.land/x/deploy/deployctl.ts"
           make
           PACKAGE_ID=$(yq -oy ".id" manifest.*)
           echo "package_id=$PACKAGE_ID" >> $GITHUB_ENV
