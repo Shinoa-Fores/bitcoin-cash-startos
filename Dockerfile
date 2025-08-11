@@ -10,7 +10,7 @@ FROM alpine:3.21 AS bitcoin-cash
 
 COPY --from=berkeleydb /opt /opt
 
-RUN sed -i 's/http\\:\\/\\/dl-cdn.alpinelinux.org/https\\:\\/\\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
+RUN sed -i 's/http:\/\/dl-cdn.alpinelinux.org/https:\/\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
 RUN apk --no-cache add \
         git \
         boost-dev \
@@ -52,7 +52,7 @@ LABEL maintainer.0="João Fonseca (@joaopaulofonseca)" \
   maintainer.2="Rui Marinho (@ruimarinho)" \
   maintainer.3="Aiden McClelland (@dr-bonez)"
 
-RUN sed -i 's/http\:\/\/dl-cdn.alpinelinux.org/https\:\/\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
+RUN sed -i 's/http:\/\/dl-cdn.alpinelinux.org/https:\/\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
 RUN apk --no-cache add \
   bash \
   curl \
