@@ -1,8 +1,8 @@
 # Build stage for BerkeleyDB
-FROM lncm/berkeleydb as berkeleydb
+FROM --platform=linux/arm64 lncm/berkeleydb AS berkeleydb
 
 # Build stage for Bitcoin Cash
-FROM alpine:3.18 as bitcoin-cash
+FROM --platform=linux/arm64 alpine:3.18 AS bitcoin-cash
 
 COPY --from=berkeleydb /opt /opt
 
@@ -23,7 +23,7 @@ RUN apk --no-cache add \
         sqlite-dev \
         zeromq-dev
 
-ADD ./bitcoin /bitcoin
+ADD ./bitcoin-cash-node /bitcoin
 
 ENV BITCOIN_PREFIX=/opt/bitcoin
 
@@ -51,7 +51,7 @@ RUN strip ${BITCOIN_PREFIX}/lib/libbitcoinconsensus.a
 RUN strip ${BITCOIN_PREFIX}/lib/libbitcoinconsensus.so.0.0.0
 
 # Build stage for compiled artifacts
-FROM alpine:3.18
+FROM --platform=linux/arm64 alpine:3.18
 
 RUN sed -i 's/http\:\/\/dl-cdn.alpinelinux.org/https\:\/\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
 RUN apk --no-cache add \
