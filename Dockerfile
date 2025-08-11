@@ -24,7 +24,7 @@ RUN apk --no-cache add \
         zeromq-dev \
         help2man \
         bash
-RUN pip install ninja
+RUN pip install ninja --break-system-packages
 
 ADD ./bitcoin-cash-node /bitcoin
 
