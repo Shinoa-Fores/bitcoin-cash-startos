@@ -17,6 +17,21 @@ jobs:
       - name: Checkout services repository
         uses: actions/checkout@v4
 
+      - name: Install Deno
+        run: |
+          curl -fsSL https://deno.land/x/install/install.sh | sh
+          export DENO_INSTALL="$HOME/.deno"
+          export PATH="$DENO_INSTALL/bin:$PATH"
+          echo "DENO_INSTALL=$DENO_INSTALL" >> $GITHUB_ENV
+          echo "PATH=$PATH" >> $GITHUB_ENV
+          deno --version
+
+      - name: Cache Deno dependencies
+        run: |
+          export PATH="$DENO_INSTALL/bin:$PATH"
+          # Pre-cache dependencies by running deno with network retry settings
+          deno cache --reload scripts/dependencies.ts || echo "Initial cache attempt failed, continuing..."
+
       - name: Build the service package
         run: |
           git submodule update --init --recursive

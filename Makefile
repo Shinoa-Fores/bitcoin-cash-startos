@@ -64,7 +64,30 @@ manager/target/x86_64-unknown-linux-musl/release/bitcoind-manager: $(MANAGER_SRC
 	docker run --rm -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/manager:/home/rust/src messense/rust-musl-cross:x86_64-musl cargo build --release
 
 scripts/embassy.js: scripts/**/*.ts
-	for i in 1 2 3; do \
-		deno bundle scripts/embassy.ts scripts/embassy.js && break || \
-		(echo "Attempt $i failed, retrying..." && sleep 5); \
+	@echo "Bundling TypeScript files with Deno..."
+	@echo "Deno version: $(deno --version 2>/dev/null || echo 'Deno not found')"
+	@echo "Current directory: $(pwd)"
+	@echo "Checking embassy.ts file..."
+	@test -f scripts/embassy.ts || (echo "ERROR: scripts/embassy.ts not found" && exit 1)
+	@echo "Attempting to bundle with deno (up to 3 attempts)..."
+	for i in 1 2 3; do 
+		echo "Attempt $i of 3..."; 
+		if deno bundle scripts/embassy.ts scripts/embassy.js; then 
+			echo "Successfully created scripts/embassy.js"; 
+			break; 
+		else 
+			echo "Attempt $i failed"; 
+			if [ $i -lt 3 ]; then 
+				echo "Retrying in 5 seconds..."; 
+				sleep 5; 
+			else 
+				echo "All attempts failed. Checking for network issues..."; 
+				echo "Contents of scripts directory:"; 
+				ls -la scripts/; 
+				echo "Contents of scripts/services directory:"; 
+				ls -la scripts/services/ 2>/dev/null || echo "services directory not found"; 
+				exit 1; 
+			fi; 
+		fi; 
 	done
+	@test -f scripts/embassy.js || (echo "ERROR: Failed to create scripts/embassy.js after all attempts" && exit 1)
