@@ -1,7 +1,7 @@
 id: bitcoind
 title: "Bitcoin Cash"
 version: 27.1.0
-eos-version: 0.3.4.3.2
+eos-version: 0.3.4.4
 release-notes: |
   * Updated to latest Start9 OS SDK
   * Fixed typo in manifest alerts section
