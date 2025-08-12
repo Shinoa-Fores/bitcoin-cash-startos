@@ -1,48 +1,36 @@
 # From https://github.com/ruimarinho/docker-bitcoin-cash
 
-# Build stage for BerkeleyDB
-ARG PLATFORM
-
-FROM lncm/berkeleydb:db-4.8.30.NC-${PLATFORM} AS berkeleydb
-
-# Build stage for Bitcoin Core
+# Build stage for Bitcoin Cash Node (using precompiled binaries)
 FROM alpine:3.21 AS bitcoin-cash
 
-COPY --from=berkeleydb /opt /opt
-
-RUN sed -i 's/http:\/\/dl-cdn.alpinelinux.org/https:\/\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
+RUN sed -i 's/http:\\/\\/dl-cdn.alpinelinux.org/https:\\/\\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
 RUN apk --no-cache add \
-        git \
-        boost-dev \
-        cmake \
-        libevent-dev \
-        openssl-dev \
-        build-base \
-        py3-pip \
-        db-dev \
-        miniupnpc-dev \
-        zeromq-dev \
-        help2man \
-        bash
-RUN pip install ninja --break-system-packages
+        curl \
+        tar
 
-ADD ./bitcoin-cash-node /bitcoin
+ARG ARCH
+ARG PLATFORM
+
+# Download and extract precompiled binaries
+RUN if [ "$ARCH" = "x86_64" ]; then \
+        curl -L https://github.com/bitcoin-cash-node/bitcoin-cash-node/releases/download/v28.0.1/bitcoin-cash-node-28.0.1-x86_64-linux-gnu.tar.gz -o bitcoin-cash-node.tar.gz; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+        curl -L https://github.com/bitcoin-cash-node/bitcoin-cash-node/releases/download/v28.0.1/bitcoin-cash-node-28.0.1-aarch64-linux-gnu.tar.gz -o bitcoin-cash-node.tar.gz; \
+    else \
+        echo "Unsupported architecture: $ARCH" && exit 1; \
+    fi
+
+RUN tar -xzf bitcoin-cash-node.tar.gz && \
+    rm bitcoin-cash-node.tar.gz
 
 ENV BITCOIN_PREFIX=/opt/bitcoin
 
-WORKDIR /bitcoin
-
-# Create build directory and build using cmake/ninja
-RUN mkdir build && \
-    cd build && \
-    cmake -GNinja .. -DBUILD_BITCOIN_WALLET=OFF -DBUILD_BITCOIN_QT=OFF -DENABLE_UPNP=OFF && \
-    ninja && \
-    mkdir -p ${BITCOIN_PREFIX}/bin && \
-    cp src/bitcoind src/bitcoin-cli src/bitcoin-tx ${BITCOIN_PREFIX}/bin/ && \
-    cd .. && \
-    rm -rf build
-
-RUN strip ${BITCOIN_PREFIX}/bin/*
+# Move binaries to the expected location
+RUN mkdir -p ${BITCOIN_PREFIX}/bin && \
+    mv bitcoin-cash-node-*/bin/* ${BITCOIN_PREFIX}/bin/ && \
+    rmdir bitcoin-cash-node-*/bin && \
+    rmdir bitcoin-cash-node-* && \
+    strip ${BITCOIN_PREFIX}/bin/*
 
 # Build stage for compiled artifacts
 FROM alpine:3.21

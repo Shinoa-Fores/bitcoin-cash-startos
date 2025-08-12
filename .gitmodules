@@ -1,3 +1,0 @@
-[submodule "bitcoin-cash-node"]
-	path = bitcoin-cash-node
-	url = https://github.com/bitcoin-cash-node/bitcoin-cash-node

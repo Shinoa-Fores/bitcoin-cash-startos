@@ -1,7 +1,7 @@
 PKG_VERSION := $(shell yq e ".version" manifest.yaml)
 PKG_ID := $(shell yq e ".id" manifest.yaml)
 MANAGER_SRC := $(shell find ./manager -name '*.rs') manager/Cargo.toml manager/Cargo.lock
-VERSION_CORE := $(shell (cd bitcoin && git describe) | sed 's/^v//')
+# $(VERSION_CORE) was previously obtained from git submodule, now hardcoded
 
 .DELETE_ON_ERROR:
 
@@ -70,7 +70,7 @@ scripts/embassy.js: scripts/**/*.ts
 	@echo "Checking embassy.ts file..."
 	@test -f scripts/embassy.ts || (echo "ERROR: scripts/embassy.ts not found" && exit 1)
 	@echo "Attempting to bundle with deno (up to 5 attempts)..."
-	@i=1; 
+	@(i=1; 
 	while [ $i -le 5 ]; do 
 		echo "Attempt $i of 5..."; 
 		if deno bundle scripts/embassy.ts scripts/embassy.js; then 
@@ -91,5 +91,5 @@ scripts/embassy.js: scripts/**/*.ts
 			fi; 
 		fi; 
 		i=$((i+1)); 
-	done
+	done)
 	@test -f scripts/embassy.js || (echo "ERROR: Failed to create scripts/embassy.js after all attempts" && exit 1)

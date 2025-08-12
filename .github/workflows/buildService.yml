@@ -37,7 +37,6 @@ jobs:
       - name: Build the service package
         id: build
         run: |
-          git submodule update --init --recursive
           start-sdk init
           make
           PACKAGE_ID=$(yq -oy ".id" manifest.*)
