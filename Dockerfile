@@ -3,7 +3,7 @@
 # Build stage for Bitcoin Cash Node (using precompiled binaries)
 FROM alpine:3.21 AS bitcoin-cash
 
-RUN sed -i 's/http:\\/\\/dl-cdn.alpinelinux.org/https:\\/\\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
+RUN sed -i 's/http:\/\/dl-cdn.alpinelinux.org/https:\/\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
 RUN apk --no-cache add \
         curl \
         tar
@@ -27,10 +27,8 @@ ENV BITCOIN_PREFIX=/opt/bitcoin
 
 # Move binaries to the expected location
 RUN mkdir -p ${BITCOIN_PREFIX}/bin && \
-    mv bitcoin-cash-node-*/bin/* ${BITCOIN_PREFIX}/bin/ && \
-    rmdir bitcoin-cash-node-*/bin && \
-    rmdir bitcoin-cash-node-* && \
-    strip ${BITCOIN_PREFIX}/bin/*
+    cp -r bitcoin-cash-node-*/bin/* ${BITCOIN_PREFIX}/bin/ && \
+    rm -rf bitcoin-cash-node-*
 
 # Build stage for compiled artifacts
 FROM alpine:3.21
