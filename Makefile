@@ -61,4 +61,5 @@ manager/target/x86_64-unknown-linux-musl/release/bitcoind-manager: $(MANAGER_SRC
 	docker run --rm -v ~/.cargo/registry:/root/.cargo/registry -v "$(shell pwd)"/manager:/home/rust/src messense/rust-musl-cross:x86_64-musl cargo build --release
 
 scripts/embassy.js: scripts/embassy.ts scripts/services/action.ts scripts/services/getConfig.ts scripts/services/migrations.ts scripts/services/properties.ts scripts/services/setConfig.ts scripts/bundle-embassy.sh
+	chmod +x scripts/bundle-embassy.sh
 	./scripts/bundle-embassy.sh
